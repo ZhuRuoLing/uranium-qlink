@@ -10,6 +10,7 @@ import net.ruogustudio.socket.ClientSocketHandler;
 import net.ruogustudio.util.Util;
 import net.ruogustudio.whitelist.Whitelist;
 import net.ruogustudio.whitelist.WhitelistReader;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.lang.management.ManagementFactory;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +51,9 @@ public class Main {
         return cipher.doFinal(base64);
     }
 
-    public static void main(String[] args) {
+    public static void main(String [] args) {
+        var os = ManagementFactory.getOperatingSystemMXBean();
+        logger.info("Uranium qLink is running on %s %s %s".formatted(os.getName(),os.getArch(),os.getVersion()));
         boolean isExampleGen = false;
         if (args.length >= 1) {
             if (Objects.equals(args[0], "--exampleGenerate")){
@@ -127,7 +131,7 @@ public class Main {
             try {
                 logger.info("Generating Client Example.");
                 Gson gson = new GsonBuilder().serializeNulls().create();
-                String cont = gson.toJson(new SControlClient("mcdreforged",Util.randomStringGen(8),50010,"127.0.0.1",Util.randomStringGen(6)));
+                String cont = gson.toJson(new SControlClient("mcdreforged",Util.randomStringGen(8),50010,"127.0.0.1",Util.randomStringGen(6),"",""));
                 File fp = new File(new Util().getWorkingDir() + File.separator + "clients" + File.separator + "example.json");
                 FileOutputStream stream = new FileOutputStream(fp);
                 OutputStreamWriter writer = new OutputStreamWriter(stream, StandardCharsets.UTF_8);

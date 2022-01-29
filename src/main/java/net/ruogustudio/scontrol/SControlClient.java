@@ -3,12 +3,13 @@ package net.ruogustudio.scontrol;
 import com.google.gson.annotations.SerializedName;
 
 public class SControlClient {
-    public SControlClient(String type, String name, int port, String ip, String key){
+    public SControlClient(String type, String name, int port, String ip, String key, String path, String workingDir){
         this.type = type;
         this.ip = ip;
         this.port = port;
         this.name = name;
         this.key = key;
+        this.path = path;
     }
     @SerializedName("type")
     String type = "";
@@ -20,6 +21,10 @@ public class SControlClient {
     String name;
     @SerializedName("key")
     String key;
+    @SerializedName("path")
+    String path;
+    @SerializedName("working_dir")
+    String workingDir;
 
     public String getName() {
         return name;
@@ -39,6 +44,22 @@ public class SControlClient {
 
     public String getKey() {
         return key;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getWorkingDir() {
+        return workingDir;
+    }
+
+    public void setWorkingDir(String workingDir) {
+        this.workingDir = workingDir;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public void setPort(int port) {
@@ -68,6 +89,9 @@ public class SControlClient {
                 ", ip='" + ip + '\'' +
                 ", port=" + port +
                 ", name='" + name + '\'' +
+                ", key='" + key + '\'' +
+                ", path='" + path + '\'' +
+                ", workingDir='" + workingDir + '\'' +
                 '}';
     }
 }
