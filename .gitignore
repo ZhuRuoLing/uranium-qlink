@@ -1,2 +1,6 @@
 # Project exclude paths
 /target/
+/logs/
+/clients/
+/config.json
+/whitelists/
