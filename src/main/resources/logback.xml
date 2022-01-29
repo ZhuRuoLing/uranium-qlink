@@ -22,12 +22,12 @@ configuration 子节点为 appender、logger、root
         </filter>
         <encoder>
             <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度 %logger输出日志的logger名 %msg：日志消息，%n是换行符 -->
-            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{36} : %msg%n</pattern>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread/%level]: %msg%n</pattern>
             <!--解决乱码问题-->
             <charset>UTF-8</charset>
         </encoder>
     </appender>
-
+   <!--[10:34:59] [Worker-Main-8/INFO]: Preparing spawn area: 4%-->
 
     <!--滚动文件-->
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -41,7 +41,7 @@ configuration 子节点为 appender、logger、root
         </rollingPolicy>
         <encoder>
             <charset>UTF-8</charset>
-            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{36} : %msg%n</pattern>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread/%level]: %msg%n</pattern>
         </encoder>
     </appender>
 
