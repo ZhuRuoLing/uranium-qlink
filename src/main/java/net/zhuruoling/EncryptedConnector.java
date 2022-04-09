@@ -1,4 +1,4 @@
-package net.ruogustudio;
+package net.zhuruoling;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

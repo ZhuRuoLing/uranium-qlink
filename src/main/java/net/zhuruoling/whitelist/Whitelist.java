@@ -1,4 +1,4 @@
-package net.ruogustudio.whitelist;
+package net.zhuruoling.whitelist;
 
 import com.google.gson.annotations.SerializedName;
 

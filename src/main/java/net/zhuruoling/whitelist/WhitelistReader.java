@@ -1,7 +1,7 @@
-package net.ruogustudio.scontrol;
+package net.zhuruoling.whitelist;
 
 import com.google.gson.Gson;
-import net.ruogustudio.util.Util;
+import net.zhuruoling.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,58 +11,59 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SControlClientFileReader {
-    List<SControlClient> clientList = new ArrayList<>();
+public class WhitelistReader {
+    List<Whitelist> whitelists = new ArrayList<>();
     Logger logger = LoggerFactory.getLogger("SControlClientFileReader");
     boolean fail = false;
-    boolean noClient = false;
-    public SControlClientFileReader(){
-        File folder = new File(new Util().getWorkingDir() + File.separator + "clients");
+    boolean noWhitelist = false;
+    public WhitelistReader(){
+        File folder = new File(new Util().getWorkingDir() + File.separator + "whitelists");
         if (folder.isDirectory() && folder.exists()){
             var v1 = folder.listFiles();
             assert v1 != null;
             if (v1.length == 0){
-                noClient = true;
+                noWhitelist = true;
             }
             for (File file:v1) {
                 BufferedReader reader = null;
                 try {
                     reader = new BufferedReader(new FileReader(file.getAbsoluteFile()));
                 } catch (FileNotFoundException e) {
-                    logger.error("Failed to read sControl Client Files.");
+                    logger.error("Failed to read whitelist Files.");
                     e.printStackTrace();
                     fail = true;
                     return;
                 }
                 Gson json = new Gson();
-                SControlClient config = json.fromJson(reader,SControlClient.class);
-                clientList.add(config);
+                Whitelist whitelist = json.fromJson(reader,Whitelist.class);
+                whitelists.add(whitelist);
             }
         }
     }
 
-    public boolean isNoClient(){
-        return noClient;
+    public boolean isNoWhitelist(){
+        return noWhitelist;
     }
 
     public boolean isFail(){
         return fail;
     }
 
-    public List<SControlClient> getClientList() {
-        return clientList;
+    public List<Whitelist> getWhitelists() {
+        return whitelists;
     }
 
-    public SControlClient read(String name){
+    public Whitelist read(String name){
         if (fail){
             return null;
         }
-        AtomicReference<SControlClient> cl = new AtomicReference<>();
-        clientList.forEach(client -> {
-            if (client.name == name){
-                cl.set(client);
+        AtomicReference<Whitelist> cl = new AtomicReference<>();
+        whitelists.forEach(whitelist -> {
+            if (Objects.equals(whitelist.name, name)){
+                cl.set(whitelist);
             }
 
         });

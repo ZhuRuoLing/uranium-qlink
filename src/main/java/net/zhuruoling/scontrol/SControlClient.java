@@ -1,4 +1,4 @@
-package net.ruogustudio.scontrol;
+package net.zhuruoling.scontrol;
 
 import com.google.gson.annotations.SerializedName;
 

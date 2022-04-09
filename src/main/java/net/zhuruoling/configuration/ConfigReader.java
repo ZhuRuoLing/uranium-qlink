@@ -1,8 +1,7 @@
-package net.ruogustudio.configuration;
+package net.zhuruoling.configuration;
 
 import com.google.gson.Gson;
-import net.ruogustudio.util.Util;
-import org.jetbrains.annotations.NotNull;
+import net.zhuruoling.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +13,9 @@ public class ConfigReader {
 
     @Nullable
     public static Configuration read(){
-        logger.info("Reading Config file.");
         char[] buf = null;
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(new Util().getWorkingDir() + File.separator + "config.json"));
+            BufferedReader reader = new BufferedReader(new FileReader(Util.getWorkingDir() + File.separator + "config.json"));
             Gson json = new Gson();
             Configuration config = json.fromJson(reader,Configuration.class);
             if (!(config == null)){

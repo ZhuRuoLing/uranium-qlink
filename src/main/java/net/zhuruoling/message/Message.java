@@ -1,4 +1,4 @@
-package net.ruogustudio.client;
+package net.zhuruoling.message;
 
 import com.google.gson.annotations.SerializedName;
 
