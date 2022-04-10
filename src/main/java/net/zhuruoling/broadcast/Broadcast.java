@@ -1,7 +1,7 @@
 package net.zhuruoling.broadcast;
 
 public class Broadcast {
-    public String time;
+    public int time;
     public String server;
     public String player;
     public String content;
@@ -18,7 +18,7 @@ public class Broadcast {
         return server;
     }
 
-    public String getTime() {
+    public int getTime() {
         return time;
     }
 
@@ -44,7 +44,7 @@ public class Broadcast {
         this.player = player;
     }
 
-    public void setTime(String time) {
+    public void setTime(int time) {
         this.time = time;
     }
 }

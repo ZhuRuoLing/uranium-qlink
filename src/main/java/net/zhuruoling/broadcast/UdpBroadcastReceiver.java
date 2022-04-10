@@ -25,13 +25,17 @@ public class UdpBroadcastReceiver extends Thread{
             socket.joinGroup(new InetSocketAddress(inetAddress,port), NetworkInterface.getByInetAddress(inetAddress));
 
             DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
-            for (;;){
-                socket.receive(packet);
-                String msg = new String(packet.getData(), packet.getOffset(),
-                        packet.getLength());
-
-                var broadcast = BroadcastBuilderKt.buildFromJson(msg);
-                logger.info("Received Broadcast:" + broadcast.getContent());
+            for (;;) {
+                try {
+                    socket.receive(packet);
+                    String msg = new String(packet.getData(), packet.getOffset(),
+                            packet.getLength());
+                    var broadcast = BroadcastBuilderKt.buildFromJson(msg);
+                    logger.info(String.format("%s <%s[%s]> %s", Integer.toString(broadcast.getTime()), broadcast.getPlayer(), broadcast.getServer(), broadcast.getContent()));
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }
         catch (Exception e){
