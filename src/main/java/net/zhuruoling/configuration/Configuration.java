@@ -6,16 +6,14 @@ import net.zhuruoling.util.Util;
 import java.util.Random;
 
 public class Configuration {
-    public Configuration(int port,int httpPort,String serverName,String key,String cryptoKey){
+    public Configuration(int port,String serverName,String key,String cryptoKey){
         this.port = port;
         this.serverName = serverName;
         this.cryptoKey = cryptoKey;
         this.key = key;
-        this.httpPort = httpPort;
     }
     public Configuration(int port,String serverName){
         this.port = port;
-        this.httpPort = new Random(System.nanoTime()).nextInt(10000,60000);
         this.serverName = serverName;
         this.cryptoKey = Util.randomStringGen(16);
         this.key = Util.randomStringGen(16);
@@ -29,16 +27,6 @@ public class Configuration {
     @SerializedName("crypto_key")
     public String cryptoKey;
 
-    @SerializedName("http_port")
-    public int httpPort;
-
-    public int getHttpPort() {
-        return httpPort;
-    }
-
-    public void setHttpPort(int httpPort) {
-        this.httpPort = httpPort;
-    }
 
     public int getPort() {
         return port;

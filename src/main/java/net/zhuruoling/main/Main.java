@@ -5,10 +5,10 @@ import com.google.gson.GsonBuilder;
 import net.zhuruoling.broadcast.UdpBroadcastReceiver;
 import net.zhuruoling.configuration.ConfigReader;
 import net.zhuruoling.configuration.Configuration;
-import net.zhuruoling.kt.TryKotlinKt;
+import net.zhuruoling.kt.TryKotlin;
 import net.zhuruoling.scontrol.SControlClient;
 import net.zhuruoling.scontrol.SControlClientFileReader;
-import net.zhuruoling.server.HTTPServer;
+import net.zhuruoling.server.HttpServer;
 import net.zhuruoling.server.SocketServer;
 import net.zhuruoling.util.Util;
 import net.zhuruoling.whitelist.Whitelist;
@@ -28,7 +28,7 @@ public class Main {
     static boolean isInit = false;
 
     public static void main(String [] args) {
-        TryKotlinKt.printOS();
+        TryKotlin.INSTANCE.printOS();
         boolean isExampleGen = false;
         if (args.length >= 1) {
             if (Objects.equals(args[0], "--exampleGenerate")){
@@ -128,10 +128,10 @@ public class Main {
         logger.info("Launching...");
         var socketServer = new SocketServer();
         socketServer.start();
-        var httpServer = new HTTPServer();
-        httpServer.start();
         var receiver = new UdpBroadcastReceiver();
         receiver.start();
+        var httpServerKt = new HttpServer();
+        httpServerKt.start();
         while (true){
 
         }
