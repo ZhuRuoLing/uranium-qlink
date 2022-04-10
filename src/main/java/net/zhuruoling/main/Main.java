@@ -80,9 +80,15 @@ public class Main {
         }
         folder = new File(Util.getWorkingDir() + File.separator + "whitelists");
         if (!folder.exists() && !folder.isDirectory()) {
-            logger.warn("No Uranium whitelist added.");
+            logger.warn("No whitelist added.");
             folder.mkdirs();
             logger.warn("created Uranium whitelist folder.");
+            isInit = true;
+        }
+        folder = new File(Util.getWorkingDir() + File.separator + "broadcasts");
+        if (!folder.exists() && !folder.isDirectory()) {
+            folder.mkdirs();
+            logger.warn("created broadcasts folder.");
             isInit = true;
         }
 
