@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class WhitelistManager {
-    private static final WhitelistReader whitelistReader = new WhitelistReader();
+    
     public WhitelistManager(){
 
     }
@@ -29,7 +29,7 @@ public class WhitelistManager {
     }
     public static WhitelistResult queryWhitelist(String whitelistName, String value){
         boolean returnValue = false;
-
+private final WhitelistReader whitelistReader = new WhitelistReader();
         if (whitelistReader.isNoWhitelist()) {
             return WhitelistResult.NO_WHITELIST;
         }
