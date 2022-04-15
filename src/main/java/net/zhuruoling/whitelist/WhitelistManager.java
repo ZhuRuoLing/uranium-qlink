@@ -29,7 +29,7 @@ public class WhitelistManager {
     }
     public static WhitelistResult queryWhitelist(String whitelistName, String value){
         boolean returnValue = false;
-private final WhitelistReader whitelistReader = new WhitelistReader();
+        WhitelistReader whitelistReader = new WhitelistReader();
         if (whitelistReader.isNoWhitelist()) {
             return WhitelistResult.NO_WHITELIST;
         }
