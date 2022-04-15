@@ -30,5 +30,5 @@ jobs:
           cp ./target/*.jar ./Uranium_qLink
     - uses: actions/upload-artifact@v2
       with:
-        name: Uranium dev binaries zip
+        name: Uranium-qLink-full
         path: Uranium_qLink
