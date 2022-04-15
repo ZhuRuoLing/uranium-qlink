@@ -32,7 +32,6 @@ jobs:
           zip -r Uranium_qLink-all.zip ./Uranium_qLink
           rm -rf ./Uranium_qLink
     - uses: actions/upload-artifact@v2
-    - name: Upload file
       with:
         name: Uranium dev binaries zip
         path: Uranium-qLink-all.zip
