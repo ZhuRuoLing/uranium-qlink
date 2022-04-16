@@ -38,7 +38,12 @@ public class ClientSocketHandler extends SocketHandler {
 
             Gson gson = new Gson();
             logger.info("Received command:" + command.getCmd() + " with load:" + Arrays.toString(command.getLoad()));
-            if (!Objects.equals(command.getLoad()[command.getLoad().length - 1], Objects.requireNonNull(ConfigReader.read()).getKey())) {
+            var load = command.getLoad();
+            var lastElementIndex = load.length - 1;
+            while(load[lastElementIndex] == null){
+                lastElementIndex = lastElementIndex - 1;
+            }
+            if (!Objects.equals(load[lastElementIndex], Objects.requireNonNull(ConfigReader.read()).getKey())) {
                 encryptedConnector.println(gson.toJson(new Message("BAD_KEY", new String[]{}), Message.class));
                 return;
             }
