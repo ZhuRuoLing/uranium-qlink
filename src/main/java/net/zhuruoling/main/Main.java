@@ -6,20 +6,20 @@ import net.zhuruoling.broadcast.UdpBroadcastReceiver;
 import net.zhuruoling.configuration.ConfigReader;
 import net.zhuruoling.configuration.Configuration;
 import net.zhuruoling.kt.TryKotlin;
-import net.zhuruoling.scontrol.SControlClient;
-import net.zhuruoling.scontrol.SControlClientFileReader;
 import net.zhuruoling.server.HttpServer;
 import net.zhuruoling.server.SocketServer;
+import net.zhuruoling.session.SessionInitialServer;
 import net.zhuruoling.util.Util;
-import net.zhuruoling.whitelist.Whitelist;
-import net.zhuruoling.whitelist.WhitelistReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class Main {
     final static Logger logger = LoggerFactory.getLogger("Main");
@@ -27,72 +27,35 @@ public class Main {
     static Configuration config = null;
     static boolean isInit = false;
 
-    public static void main(String [] args) {
+    public static void main(String [] args) throws IOException {
         TryKotlin.INSTANCE.printOS();
         boolean isExampleGen = false;
         if (args.length >= 1) {
             if (Objects.equals(args[0], "--exampleGenerate")){
                 logger.info("Generating examples.");
-                isExampleGen = true;
-                isInit = true;
-            }
-            else if (Objects.equals(args[0], "--testCrypto")){
-                Util.testCrypto();
+                Util.generateExample();
                 System.exit(0);
             }
         }
 
         logger.info("Hello World!");
 
-        if (!new Util().fileExists(Util.getWorkingDir() + File.separator + "config.json")){
-            logger.warn("CONFIG NOT EXIST,creating.");
-            try {
-                if (!new Util().createFile(Util.getWorkingDir() + File.separator + "config.json")){
-                    logger.error("Unable to create file:" + Util.getWorkingDir() + File.separator + "config.json");
-                    System.exit(-1);
-                }
-                logger.info("Created Config,writing default config.");
-                Gson gson = new GsonBuilder().serializeNulls().create();
-                String cont = gson.toJson(new Configuration(50000,"Uranium"));
-                File fp = new File(Util.getWorkingDir() + File.separator + "config.json");
-                FileOutputStream stream = new FileOutputStream(fp);
-                OutputStreamWriter writer = new OutputStreamWriter(stream, StandardCharsets.UTF_8);
-                writer.append(cont);
-                writer.close();
-                stream.close();
-                logger.info("Created Config.");
-                isInit = true;
-            } catch (IOException e) {
-                e.printStackTrace();
-                isInit = true;
-            }
+        if (!Util.fileExists(Util.getWorkingDir() + File.separator + "config.json")) {
+            isInit = true;
+            Util.createConfig(logger);
         }
-        File folder = new File(Util.getWorkingDir() + File.separator + "clients");
+        for (String folder : Util.dataFolders.clone()) {
+            File file = new File(Util.getWorkingDir() + File.separator + folder);
+            if (!file.exists() || !file.isDirectory())
+                isInit = true;
+        }
 
-        if (!folder.exists() && !folder.isDirectory()) {
-            logger.warn("No Uranium sControl Client added.");
-            folder.mkdirs();
-            logger.warn("created Uranium sControl Client folder.");
-            isInit = true;
-        }
-        if (isExampleGen) {
-           Util.generateExample();
-        }
-        folder = new File(Util.getWorkingDir() + File.separator + "whitelists");
-        if (!folder.exists() && !folder.isDirectory()) {
-            logger.warn("No whitelist added.");
-            folder.mkdirs();
-            logger.warn("created Uranium whitelist folder.");
-            isInit = true;
-        }
-        folder = new File(Util.getWorkingDir() + File.separator + "broadcasts");
-        if (!folder.exists() && !folder.isDirectory()) {
-            folder.mkdirs();
-            logger.warn("created broadcasts folder.");
-            isInit = true;
-        }
 
         if (isInit){
+            logger.info("Preparing for data folders.");
+            for (String folder : Util.dataFolders.clone()) {
+                Util.createFolder(Util.getWorkingDir() + File.separator + folder, logger);
+            }
             System.exit(0);
         }
 
@@ -100,47 +63,35 @@ public class Main {
         config = ConfigReader.read();
         if (config == null){
             logger.error("Empty CONFIG.");
-        }
-
-        logger.info("Listing qControl Clients:");
-        SControlClientFileReader reader = new SControlClientFileReader();
-        if (reader.isFail()){
-            logger.error("Failed to read qControl Clients.");
             System.exit(1);
         }
-        if (!reader.isNoClient()) {
-            List<SControlClient> clientList = reader.getClientList();
-            clientList.forEach(client -> logger.info( "  -" + client.toString()));
-        }
-        else {
-            logger.warn("No qControl Clients added.");
-        }
 
-        logger.info("Listing Whitelist contents:");
-        WhitelistReader reader_ = new WhitelistReader();
-        if (reader.isFail()){
-            logger.error("Failed to read Whitelists.");
-            System.exit(1);
-        }
-        if (!reader_.isNoWhitelist()) {
-            List<Whitelist> whitelists = reader_.getWhitelists();
-            whitelists.forEach(client -> logger.info( "  -" + client.toString()));
-        }
-        else {
-            logger.warn("No Whitelist added.");
-        }
+        Util.listAll(logger);
+
+
 
         logger.info("Server key:" + config.getKey() + " Server crypto key:" + config.getCryptoKey());
         logger.info("Launching...");
-        var socketServer = new SocketServer();
+
+        var socketServer = new SessionInitialServer();
         socketServer.start();
         var receiver = new UdpBroadcastReceiver();
         receiver.start();
         var httpServerKt = new HttpServer();
         httpServerKt.start();
-        while (true){
 
+
+        while (true){
+            Scanner scanner = new Scanner(System.in);
+            String line = scanner.nextLine();
+            if (Objects.equals(line, "stop")){
+                break;
+            }
         }
+        receiver.interrupt();
+        socketServer.interrupt();
+        httpServerKt.interrupt();
+        System.exit(0);
         //logger.info("Exit.");
     }
 }

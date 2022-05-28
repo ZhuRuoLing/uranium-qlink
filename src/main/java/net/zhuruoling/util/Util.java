@@ -2,25 +2,30 @@ package net.zhuruoling.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.zhuruoling.configuration.Configuration;
 import net.zhuruoling.scontrol.SControlClient;
+import net.zhuruoling.scontrol.SControlClientFileReader;
+import net.zhuruoling.whitelist.Whitelist;
+import net.zhuruoling.whitelist.WhitelistReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
+import java.util.List;
 import java.util.Random;
 
 public class Util {
 
-    public boolean fileExists(String fileName){
+
+    public static final String PRODUCT_NAME = "Oh My Minecraft Server Central";
+    public static final String PRODUCT_NAME_SHORT = "OMMS Central";
+    public static final String[] dataFolders = {
+            "controller",
+            "broadcast",
+            "whitelist",
+    };
+    public static boolean fileExists(String fileName){
         try {
             new FileReader(fileName);
             return true;
@@ -35,11 +40,11 @@ public class Util {
         return directory.getAbsolutePath();
     }
 
-     public boolean createFile(String filePath) throws IOException {
-         return new File(filePath).createNewFile();
-     }
+    public boolean createFile(String filePath) throws IOException {
+        return new File(filePath).createNewFile();
+    }
 
-     public static String randomStringGen(int len){
+    public static String randomStringGen(int len){
         String ch = "abcdefghijklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder stringBuffer = new StringBuilder();
         for (int i = 0;i < len; i++){
@@ -48,56 +53,10 @@ public class Util {
             stringBuffer.append(ch.charAt(num));
         }
         return stringBuffer.toString();
-     }
-    private static byte[] encryptECB(byte[] data, byte[] key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException
-    {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"));
-        var result = cipher.doFinal(data);
-        return Base64.getEncoder().encode(result);
     }
 
-    private static byte[] decryptECB(byte[] data, byte[] key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"));
-        byte[] base64 = Base64.getDecoder().decode(data);
-        return cipher.doFinal(base64);
-    }
-     public static void testCrypto(){
-         final Logger logger = LoggerFactory.getLogger("Util");
-         var key = Util.randomStringGen(new Random(System.nanoTime()).nextInt(4,32));
-         if (key.length() <= 16){
-             StringBuilder keyBuilder = new StringBuilder(key);
-             while (keyBuilder.length() < 16)
-                 keyBuilder.append("0");
-             key = keyBuilder.toString();
-         }
-         else {
-             if (key.length() <= 32) {
-                 StringBuilder keyBuilder = new StringBuilder(key);
-                 while (keyBuilder.length() < 32)
-                     keyBuilder.append("0");
-                 key = keyBuilder.toString();
-             }
-         }
-         var data = Util.randomStringGen(16);
 
-         try {
-             var dataEncrypted = encryptECB(data.getBytes(StandardCharsets.UTF_8),key.getBytes(StandardCharsets.UTF_8));
-             var dataDecrypted = decryptECB(dataEncrypted,key.getBytes(StandardCharsets.UTF_8));
-             String s = "\nkey:" + key + "\n" + "data:" + data +
-                     "\n" +
-                     "dataEncrypted:" + new String(dataEncrypted) +
-                     "\ndataDecrypted:" + new String(dataDecrypted);
-             logger.info(s);
-         } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-             e.printStackTrace();
-         }
-
-
-     }
-
-     public static void generateExample(){
+    public static void generateExample(){
          try {
              final Logger logger = LoggerFactory.getLogger("Util");
              logger.info("Generating Client Example.");
@@ -113,6 +72,65 @@ public class Util {
          catch (Exception e){
              e.printStackTrace();
          }
-     }
+    }
+    public static void createFolder(String path, Logger logger){
+        File file = new File(path);
+        if (!file.exists()){
+            file.mkdirs();
+            logger.info("Created folder " + path);
+        }
+
+    }
+
+    public static void createConfig(Logger logger){
+        logger.warn("CONFIG NOT EXIST,creating.");
+        try {
+            if (!new Util().createFile(Util.getWorkingDir() + File.separator + "config.json")){
+                logger.error("Unable to create file:" + Util.getWorkingDir() + File.separator + "config.json");
+                System.exit(-1);
+            }
+            logger.info("Created Config,writing default config.");
+            Gson gson = new GsonBuilder().serializeNulls().create();
+            String cont = gson.toJson(new Configuration(50000,"Uranium"));
+            File fp = new File(Util.getWorkingDir() + File.separator + "config.json");
+            FileOutputStream stream = new FileOutputStream(fp);
+            OutputStreamWriter writer = new OutputStreamWriter(stream, StandardCharsets.UTF_8);
+            writer.append(cont);
+            writer.close();
+            stream.close();
+            logger.info("Created Config.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void listAll(Logger logger){
+        logger.info("Listing controllers");
+        SControlClientFileReader reader = new SControlClientFileReader();
+        if (reader.isFail()){
+            logger.error("Failed to read controllers.");
+            System.exit(1);
+        }
+        if (!reader.isNoClient()) {
+            List<SControlClient> clientList = reader.getClientList();
+            clientList.forEach(client -> logger.info( "  -" + client.toString()));
+        }
+        else {
+            logger.warn("No controllers added.");
+        }
+        logger.info("Listing Whitelist contents:");
+        WhitelistReader reader_ = new WhitelistReader();
+        if (reader.isFail()){
+            logger.error("Failed to read Whitelists.");
+            System.exit(1);
+        }
+        if (!reader_.isNoWhitelist()) {
+            List<Whitelist> whitelists = reader_.getWhitelists();
+            whitelists.forEach(client -> logger.info( "  -" + client.toString()));
+        }
+        else {
+            logger.warn("No Whitelist added.");
+        }
+    }
+
 
 }

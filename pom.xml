@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.zhuruoling</groupId>
-    <artifactId>uranium-qlink</artifactId>
+    <artifactId>omms-central</artifactId>
     <version>0.8-SNAPSHOT</version>
     <repositories>
         <repository>
@@ -18,6 +18,13 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+
+        <repository>
+            <id>minecraft-libraries</id>
+            <name>Minecraft Libraries</name>
+            <url>https://libraries.minecraft.net</url>
+        </repository>
+
     </repositories>
 
     <properties>
@@ -29,7 +36,11 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
     </properties>
     <dependencies>
-
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>brigadier</artifactId>
+            <version>1.0.18</version>
+        </dependency>
         <dependency>
             <groupId>io.ktor</groupId>
             <artifactId>ktor-server-call-logging-jvm</artifactId>
@@ -114,6 +125,7 @@
             <version>4.1.75.Final</version>
             <scope>compile</scope>
         </dependency>
+
     </dependencies>
     <build>
         <plugins>
