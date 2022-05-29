@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Random;
 
@@ -82,6 +83,9 @@ public class Util {
 
     }
 
+    public static String base64(String content){
+        return Base64.getEncoder().encodeToString(content.getBytes(StandardCharsets.UTF_8));
+    }
     public static void createConfig(Logger logger){
         logger.warn("CONFIG NOT EXIST,creating.");
         try {

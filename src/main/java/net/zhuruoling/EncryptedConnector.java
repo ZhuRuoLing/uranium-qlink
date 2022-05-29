@@ -42,6 +42,9 @@ public class EncryptedConnector {
                     keyBuilder.append("0");
                 key = keyBuilder.toString();
             }
+            else {
+                throw new RuntimeException();
+            }
         }
         this.key = key.getBytes(StandardCharsets.UTF_8);
     }
